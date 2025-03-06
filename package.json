@@ -1,5 +1,13 @@
 {
+  "name": "actions-project-testrun",
+  "version": "1.0.0",
+  "main": "update-status.js",
+  "type": "module",
+  "scripts": {
+    "start": "node update-status.js"
+  },
   "dependencies": {
-    "@octokit/rest": "^21.1.1"
+    "@actions/github": "^5.0.0",
+    "@octokit/rest": "^18.0.0"
   }
 }

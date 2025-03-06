@@ -17,6 +17,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run status update script
-        run: node update-status.mjs
+        run: node update-status.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
