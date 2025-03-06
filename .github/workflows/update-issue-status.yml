@@ -1,0 +1,27 @@
+name: Update Issue Status
+
+on:
+  pull_request:
+    types: [opened, edited, closed]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  update_status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run status update script
+        run: node update-status.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
