@@ -11,6 +11,7 @@ async function run() {
 
   if (context.eventName === "pull_request") {
     const pr = context.payload.pull_request;
+    console.log(`PR body: ${pr.body}`);
     const issueNumber = extractIssueNumber(pr.body);
     console.log(`Pull request event detected. Issue number: ${issueNumber}`);
 
@@ -31,16 +32,28 @@ async function run() {
     }
   } else if (context.eventName === "pull_request_review") {
     const pr = context.payload.pull_request;
+    const review = context.payload.review;
+    console.log(`PR body: ${pr.body}`);
     const issueNumber = extractIssueNumber(pr.body);
     console.log(
       `Pull request review event detected. Issue number: ${issueNumber}`
     );
+    console.log(`Review state: ${review.state}`);
 
     if (issueNumber) {
-      console.log(
-        `PR review submitted. Updating issue #${issueNumber} to "Under review"`
-      );
-      await updateIssueStatus(issueNumber, "Under review");
+      if (
+        review.state === "approved" ||
+        review.state === "changes_requested" ||
+        review.state === "commented" ||
+        review.state === "dismissed"
+      ) {
+        console.log(
+          `PR review submitted. Updating issue #${issueNumber} to "Under review"`
+        );
+        await updateIssueStatus(issueNumber, "Under review");
+      } else {
+        console.log(`Review state not handled: ${review.state}`);
+      }
     } else {
       console.log("No issue number found in PR body.");
     }
@@ -58,10 +71,27 @@ function extractIssueNumber(text) {
 async function updateIssueStatus(issueNumber, status) {
   const context = github.context;
   console.log(`Updating issue #${issueNumber} with status: ${status}`);
+
+  let state;
+  switch (status) {
+    case "Needs review":
+      state = "open";
+      break;
+    case "Under review":
+      state = "open";
+      break;
+    case "Pending auto close":
+      state = "closed";
+      break;
+    default:
+      state = "open";
+  }
+
   await octokit.issues.update({
     owner: context.repo.owner,
     repo: context.repo.repo,
     issue_number: issueNumber,
+    state: state,
     labels: [status],
   });
 }
