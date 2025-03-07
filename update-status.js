@@ -50,6 +50,7 @@ async function run() {
 }
 
 function extractIssueNumber(text) {
+  console.log(`Extracting issue number from text: ${text}`);
   const match = text.match(/#(\d+)/);
   return match ? match[1] : null;
 }
